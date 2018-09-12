@@ -23,17 +23,13 @@
 
 
 # https://www.cnblogs.com/york-hust/archive/2012/06/12/2546334.html, how to change cd
-#ISO_WIN10=./cn_windows_10_pro_10240.16393_x64_pip.iso
-ISO_WIN10=/mnt/share/ISO/cn_windows_10_multiple_editions_x64_dvd_6848463.iso #./cn_windows_10_pro_10240.16393_x64_pip.iso
-ISO_DRV=./drv.iso  #mkisofs -r -l -o destination-filename.iso source
-QEMU=/usr/bin/qemu-system-x86_64
-#QEMU=/usr/bin/qemu-system-x86_64 #qemu-system-x86_64
-#QEMU=/usr/qemu2.12.1/bin/qemu-system-x86_64
-#QEMU=/usr/qemu3/bin/qemu-system-x86_64
-MEM=6G #OOM Killer, sysctl -w vm.overcommit_memory=2,https://blog.csdn.net/fm0517/article/details/73105309/
+ISO_WIN10=$OS_ISO
+ISO_DRV=$DRV_ISO  #mkisofs -r -l -o destination-filename.iso source
+QEMU=qemu-system-x86_64
+MEM=$RAM #OOM Killer, sysctl -w vm.overcommit_memory=2,https://blog.csdn.net/fm0517/article/details/73105309/
 BOOT_SPLASH='./gnu_tux-800x600.jpg'
 
-vmname="windows10vm"
+vmname=$VM_NAME
 if ps -A | grep -q $vmname; then
   echo "$vmname is already running." &
   exit 1
@@ -41,8 +37,8 @@ fi
 
 # lspci -nnk
 # intel igd driver: https://www.intel.cn/content/www/cn/zh/support/products/80939/graphics-drivers.html
-VGAID='8086 01916'
-VGAHOST='0000:00:02.0'
+VGAID=$VGAID
+VGAHOST=$VGAHOST
 
 func_sig_exit () 
 {
@@ -90,9 +86,7 @@ func_audio_init () {
   echo "sound init.."
   # https://www.reddit.com/r/VFIO/comments/746t4h/getting_rid_of_audio_crackling_once_and_for_all/
   # ./configure --prefix=/usr --target-list=x86_64-softmmu --audio-drv-list=pa,alsa
-  export QEMU_AUDIO_DRV=alsa #none #spice #pa #alsa
-  export QEMU_PA_SAMPLES=2205 #128 #2205
-  export QEMU_PA_LATENCY_OUT=20
+  export QEMU_AUDIO_DRV=$QEMU_AUDIO_DRV #none #spice #pa #alsa
   export QEMU_AUDIO_TIMER_PERIOD=0
   #export QEMU_PA_SERVER=/run/user/0/pulse/native
 }
@@ -125,25 +119,25 @@ func_idv_start() {
   -name $vmname,process=$vmname \
   -machine type=pc,accel=kvm,igd-passthru=on \
   -cpu host,kvm=off \
-  -smp 2,sockets=2,cores=1,threads=1,maxcpus=2 \
+  -smp $SMP,sockets=$SOCKETS,cores=$CORES,threads=$THREADS,maxcpus=$MAXCPUS \
   -m $MEM \
   -rtc clock=host,base=localtime \
-  -vnc 0.0.0.0:1 \
+  -vnc $VNC \
   -serial none \
   -parallel none \
   -vga none \
-  -device vfio-pci,host=00:02.0,id=hostdev0,bus=pci.0,addr=0x02,romfile=./vbios.bin \
-  -device AC97 \
+  -device vfio-pci,host=$VGAHOST_SHORT,id=hostdev0,bus=pci.0,addr=0x02,romfile=$ROM_FILE \
+  -device $AUDIO_DEVICE \
   -drive file=$ISO_DRV,index=2,media=cdrom \
-  -boot order=c,menu=on,splash=./boot.jpg,splash-time=5000 \
-  -drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=./win10.qcow2 \
+  -boot order=$BOOT_ORDER,menu=on,splash=./boot.jpg,splash-time=5000 \
+  -drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE \
   -device virtio-net-pci,netdev=net0,mac=00:16:3e:00:01:01 \
   -netdev type=user,hostfwd=tcp::3389-:3389,id=net0 \
   -chardev file,id=seabios,path=/tmp/bios.log \
   -device isa-debugcon,iobase=0x402,chardev=seabios \
-  -monitor telnet:127.0.0.1:55555,server,nowait \
-  -object input-linux,id=kbd1,evdev=/dev/input/event4,grab_all=on,repeat=on \
-  -object input-linux,id=mouse,evdev=/dev/input/by-path/pci-0000:00:14.0-usb-0:8:1.0-event-mouse \
+  -monitor telnet:$TELNET,server,nowait \
+  -object input-linux,id=kbd1,evdev=$KBD_DEVICE_EVENT,grab_all=on,repeat=on \
+  -object input-linux,id=mouse,evdev=$MOUSE_DEVICE_EVENT \
   -mem-path /dev/hugepages -mem-prealloc
   echo "idv stoped"
 }
