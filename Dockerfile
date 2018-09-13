@@ -1,5 +1,5 @@
 FROM ubuntu:18.04
-MAINTAINER xhzhang zzz332191120@gmail.com
+LABEL MAINTAINER="xhzhang zzz332191120@gmail.com"
 
 RUN \
   apt-get update && \

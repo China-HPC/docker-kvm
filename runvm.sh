@@ -147,11 +147,3 @@ func_audio_init
 func_hugepage_init
 func_idv_start
 func_sig_exit
-
-#-boot order=d,menu=on,splash=$BOOT_SPLASH,splash-time=10,reboot-timeout=10 \
-#  -drive file=$ISO_WIN10,index=1,media=cdrom \
-#-device isa-vga \
-#-vga none
-#x-igd-gms=1
-#-device vfio-pci,host=00:02.0,id=hostdev0,bus=pci.0,addr=0x02,romfile=./vbios.bin \ #need rom-fixer, https://www.redhat.com/archives/vfio-users/2017-March/msg00152.html
-#  -bios ./seabios-latest.bin \
