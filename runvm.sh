@@ -27,7 +27,7 @@ ISO_WIN10=$OS_ISO
 ISO_DRV=$DRV_ISO  #mkisofs -r -l -o destination-filename.iso source
 QEMU=qemu-system-x86_64
 MEM=$RAM #OOM Killer, sysctl -w vm.overcommit_memory=2,https://blog.csdn.net/fm0517/article/details/73105309/
-BOOT_SPLASH='./gnu_tux-800x600.jpg'
+BOOT_SPLASH='/kvm/gnu_tux-800x600.jpg'
 
 vmname=$VM_NAME
 if ps -A | grep -q $vmname; then
@@ -129,7 +129,7 @@ func_idv_start() {
   -device vfio-pci,host=$VGAHOST_SHORT,id=hostdev0,bus=pci.0,addr=0x02,romfile=$ROM_FILE \
   -device $AUDIO_DEVICE \
   -drive file=$ISO_DRV,index=2,media=cdrom \
-  -boot order=$BOOT_ORDER,menu=on,splash=./boot.jpg,splash-time=5000 \
+  -boot order=$BOOT_ORDER,menu=on,splash=/kvm/boot.jpg,splash-time=5000 \
   -drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE \
   -device virtio-net-pci,netdev=net0,mac=00:16:3e:00:01:01 \
   -netdev type=user,hostfwd=tcp::3389-:3389,id=net0 \
