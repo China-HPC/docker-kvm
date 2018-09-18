@@ -43,7 +43,6 @@ VGAHOST=$VGAHOST
 func_sig_exit () 
 {
   echo "signal caught"
-  func_hugepage_reset
   func_audio_reset
   func_vfio_reset
   exit 0
@@ -60,8 +59,6 @@ func_vfio_reset () {
   echo "vfio reset"
   echo "1" > /sys/bus/pci/devices/$VGAHOST/remove
   echo "1" > /sys/bus/pci/rescan
- # echo $VGAHOST > /sys/bus/pci/drivers/vfio-pci/unbind
- # echo $VGAHOST > /sys/bus/pci/drivers/i915/bind
 }
 
 # Audio in win10 GUEST
@@ -96,20 +93,6 @@ func_audio_reset () {
   #pulseaudio -k
 }
 
-func_hugepage_init () {
-  echo "hugepage init.."
-  #https://heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-vga-passthrough/#Configure_hugepages
-  #hugeadm --explain
-  mount -t hugetlbfs hugetlbfs /dev/hugepages
-  sysctl vm.nr_hugepages=3072 #6G memory
-}
-
-func_hugepage_reset () {
-  echo "hugepage reset"
-  umount /dev/hugepages
-  sysctl vm.nr_hugepages=0
-  echo 3 > /proc/sys/vm/drop_caches #drop cache
-}
 
 func_idv_start() {
   echo "idv starting..."
@@ -144,6 +127,5 @@ func_idv_start() {
 
 func_vfio_init
 func_audio_init
-func_hugepage_init
 func_idv_start
 func_sig_exit
