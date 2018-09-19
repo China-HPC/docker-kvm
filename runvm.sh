@@ -449,8 +449,8 @@ func_idv_start() {
   -chardev file,id=seabios,path=/tmp/bios.log \
   -device isa-debugcon,iobase=0x402,chardev=seabios \
   -monitor telnet:$TELNET,server,nowait \
-  -object input-linux,id=kbd1,evdev=$KBD_DEVICE_EVENT,grab_all=on,repeat=on \
-  -object input-linux,id=mouse,evdev=$MOUSE_DEVICE_EVENT \
+  -object input-linux,id=kbd1,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-kbd`,grab_all=on,repeat=on \
+  -object input-linux,id=mouse,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-mouse` \
   -mem-path /dev/hugepages -mem-prealloc
   echo "idv stoped"
 }

@@ -29,8 +29,6 @@ ENV AUDIO_DEVICE='AC97'
 ENV BOOT_ORDER='c'
 ENV DISK_FILE=/kvm/disk.qcow2
 ENV TELNET='127.0.0.1:55555'
-ENV KBD_DEVICE_EVENT='/dev/input/by-path/pci-0000:00:14.0-usb-0:5.1:1.0-event-kbd'
-ENV MOUSE_DEVICE_EVENT='/dev/input/by-path/pci-0000:00:14.0-usb-0:8:1.0-event-mouse'
 
 VOLUME /data
 
