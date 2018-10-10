@@ -35,10 +35,6 @@
 : ${AUTO_ATTACH:='Y'}
 mkdir -p /etc/qemu
 # https://www.cnblogs.com/york-hust/archive/2012/06/12/2546334.html, how to change cd
-<<<<<<< HEAD
-ISO_DRV=$DRV_ISO  #mkisofs -r -l -o destination-filename.iso source
-=======
->>>>>>> fix: missing OS_ISO parameter for qemu command
 QEMU=qemu-system-x86_64
 MEM=$RAM #OOM Killer, sysctl -w vm.overcommit_memory=2,https://blog.csdn.net/fm0517/article/details/73105309/
 BOOT_SPLASH='/kvm/gnu_tux-800x600.jpg'
