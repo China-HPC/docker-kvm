@@ -35,7 +35,10 @@
 : ${AUTO_ATTACH:='Y'}
 mkdir -p /etc/qemu
 # https://www.cnblogs.com/york-hust/archive/2012/06/12/2546334.html, how to change cd
+<<<<<<< HEAD
 ISO_DRV=$DRV_ISO  #mkisofs -r -l -o destination-filename.iso source
+=======
+>>>>>>> fix: missing OS_ISO parameter for qemu command
 QEMU=qemu-system-x86_64
 MEM=$RAM #OOM Killer, sysctl -w vm.overcommit_memory=2,https://blog.csdn.net/fm0517/article/details/73105309/
 BOOT_SPLASH='/kvm/gnu_tux-800x600.jpg'
@@ -442,7 +445,7 @@ func_idv_start() {
   -device vfio-pci,host=$VGAHOST_SHORT,id=hostdev0,bus=pci.0,addr=0x02,romfile=$ROM_FILE \
   -device $AUDIO_DEVICE \
   -drive file=$OS_ISO,index=2,media=cdrom \
-  -drive file=$ISO_DRV,index=3,media=cdrom \
+  -drive file=$DRV_ISO,index=3,media=cdrom \
   -boot order=$BOOT_ORDER,menu=on,splash=/kvm/boot.jpg,splash-time=5000 \
   -drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE \
   $KVM_NET_OPTS \
