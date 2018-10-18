@@ -357,7 +357,9 @@ if [[ "$ENABLE_DHCP" == 1 ]]; then
   # Hack for guest VMs complaining about "bad udp checksums in 5 packets"
   /sbin/iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
 
-  # Build DNS options from container /etc/resolv.conf
+  # Build DNS options from container /etc/resolv.conf, you can edit resolv.conf on the 
+  # host machine then mount it into container. You can also specify those parameters
+  # by setting environment variables.
   nameservers=($(grep nameserver /etc/resolv.conf | sed 's/nameserver //'))
   searchdomains=$(grep search /etc/resolv.conf | sed 's/search //' | sed 's/ /,/g')
   domainname=$(echo $searchdomains | awk -F"," '{print $1}')
@@ -368,9 +370,9 @@ if [[ "$ENABLE_DHCP" == 1 ]]; then
   DNSMASQ_OPTS="$DNSMASQ_OPTS                         \
     --dhcp-option=option:dns-server,$DNS_SERVERS      \
     --dhcp-option=option:router,$DEFAULT_ROUTE        \
-    --dhcp-option=option:domain-search,$searchdomains \
-    --dhcp-option=option:domain-name,$domainname      \
     "
+  [[ -z $searchdomains ]] || DNSMASQ_OPTS="$DNSMASQ_OPTS --dhcp-option=option:domain-search,$searchdomains"
+  [[ -z $domainname ]] || DNSMASQ_OPTS="$DNSMASQ_OPTS --dhcp-option=option:domain-name,$domainname"
   [[ -z $(hostname -d) ]] || DNSMASQ_OPTS="$DNSMASQ_OPTS --dhcp-option=option:domain-name,$(hostname -d)"
   log "INFO" "Lauching dnsmasq"
   log "DEBUG" "dnsmasq options: $DNSMASQ_OPTS"
