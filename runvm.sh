@@ -452,7 +452,11 @@ func_idv_start() {
   -monitor telnet:$TELNET,server,nowait \
   -object input-linux,id=kbd1,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-kbd`,grab_all=on,repeat=on \
   -object input-linux,id=mouse,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-mouse` \
-  -mem-path /dev/hugepages -mem-prealloc
+  -mem-path /dev/hugepages -mem-prealloc \
+  -usbdevice tablet \
+  -no-hpet \
+  -global PIIX4_PM.disable_s3=1 \
+  -global PIIX4_PM.disable_s4=1 \
   echo "idv stoped"
 }
 
