@@ -3,7 +3,7 @@ LABEL MAINTAINER="xhzhang zzz332191120@gmail.com"
 
 RUN \
   apt-get update && \
-  apt-get install -y qemu-kvm qemu-utils iptables bridge-utils iproute2 iputils-ping dnsmasq net-tools && \
+  apt-get install -y qemu-kvm qemu-utils telnet iptables bridge-utils iproute2 iputils-ping dnsmasq net-tools && \
   apt-get autoclean && \
   apt-get autoremove && \
   rm -rf /var/lib/apt/lists/*
