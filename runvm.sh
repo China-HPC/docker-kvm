@@ -457,6 +457,7 @@ func_idv_start() {
   -no-hpet \
   -global PIIX4_PM.disable_s3=1 \
   -global PIIX4_PM.disable_s4=1 \
+  -usb -device usb-ehci,id=usb,bus=pci.0,addr=0x5
   echo "idv stoped"
 }
 
