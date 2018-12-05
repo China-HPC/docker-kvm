@@ -37,14 +37,13 @@ mkdir -p /etc/qemu
 # https://www.cnblogs.com/york-hust/archive/2012/06/12/2546334.html, how to change cd
 QEMU=qemu-system-x86_64
 MEM=$RAM #OOM Killer, sysctl -w vm.overcommit_memory=2,https://blog.csdn.net/fm0517/article/details/73105309/
-BOOT_SPLASH='/kvm/gnu_tux-800x600.jpg'
+BOOT_SPLASH='/kvm/boot.jpg'
 
 func_sig_exit ()
 {
   echo "signal caught"
   func_audio_reset
   func_vfio_reset
-  exit 0
 }
 trap func_sig_exit SIGKILL SIGINT SIGTERM
 
@@ -444,7 +443,7 @@ func_idv_start() {
   -device $AUDIO_DEVICE \
   -drive file=$OS_ISO,index=2,media=cdrom \
   -drive file=$DRV_ISO,index=3,media=cdrom \
-  -boot order=$BOOT_ORDER,menu=on,splash=/kvm/boot.jpg,splash-time=5000 \
+  -boot order=$BOOT_ORDER,menu=on,splash=$BOOT_SPLASH,splash-time=5000 \
   -drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE \
   $KVM_NET_OPTS \
   -chardev file,id=seabios,path=/tmp/bios.log \
@@ -455,12 +454,18 @@ func_idv_start() {
   -mem-path /dev/hugepages -mem-prealloc \
   -no-hpet \
   -global PIIX4_PM.disable_s3=1 \
-  -global PIIX4_PM.disable_s4=1 \
-  -usb -device usb-ehci,id=usb,bus=pci.0,addr=0x5
+  -global PIIX4_PM.disable_s4=1
+  if [ $? -ne 0 ]; then
+    echo "idv start failed"
+    func_sig_exit
+    exit 1
+  fi
   echo "idv stoped"
+  func_sig_exit
 }
 
-func_vfio_init
+## call func_vfio_init on host, if running this script on host machine instead
+## of container, should uncomment #func_vfio_init
+#func_vfio_init
 func_audio_init
 func_idv_start
-func_sig_exit
