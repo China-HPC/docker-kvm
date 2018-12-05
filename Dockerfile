@@ -12,7 +12,7 @@ ADD runvm.sh /
 
 ENV OS_ISO=/kvm/cn_windows_10_multiple_editions_x64_dvd_6848463.iso
 ENV DRV_ISO=/kvm/drv.iso
-ENV RAM=2048
+ENV RAM=6144
 ENV SMP=1
 ENV SOCKETS=1
 ENV CORES=2

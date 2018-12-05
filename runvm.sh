@@ -426,35 +426,43 @@ func_audio_reset () {
 
 func_idv_start() {
   echo "idv starting..."
-  $QEMU \
-  -nodefaults \
-  -enable-kvm \
-  -name $vmname,process=$vmname \
-  -machine type=pc,accel=kvm,igd-passthru=on \
-  -cpu host,kvm=off \
-  -smp $SMP,sockets=$SOCKETS,cores=$CORES,threads=$THREADS,maxcpus=$MAXCPUS \
-  -m $MEM \
-  -rtc clock=host,base=localtime \
-  -vnc $VNC \
-  -serial none \
-  -parallel none \
-  -vga none \
-  -device vfio-pci,host=$VGAHOST_SHORT,id=hostdev0,bus=pci.0,addr=0x02,romfile=$ROM_FILE \
-  -device $AUDIO_DEVICE \
-  -drive file=$OS_ISO,index=2,media=cdrom \
-  -drive file=$DRV_ISO,index=3,media=cdrom \
-  -boot order=$BOOT_ORDER,menu=on,splash=$BOOT_SPLASH,splash-time=5000 \
-  -drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE \
-  $KVM_NET_OPTS \
-  -chardev file,id=seabios,path=/tmp/bios.log \
-  -device isa-debugcon,iobase=0x402,chardev=seabios \
-  -monitor telnet:$TELNET,server,nowait \
-  -object input-linux,id=kbd1,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-kbd`,grab_all=on,repeat=on \
-  -object input-linux,id=mouse,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-mouse` \
-  -mem-path /dev/hugepages -mem-prealloc \
-  -no-hpet \
-  -global PIIX4_PM.disable_s3=1 \
-  -global PIIX4_PM.disable_s4=1
+  QEMUArgs=("-nodefaults" "-enable-kvm"
+  "-machine type=pc,accel=kvm,igd-passthru=on"
+  "-cpu host,kvm=off"
+  "-rtc clock=host,base=localtime"
+  "-no-hpet"
+  "-serial none"
+  "-parallel none"
+  "-device isa-debugcon,iobase=0x402,chardev=seabios"
+  "-chardev file,id=seabios,path=/tmp/bios.log"
+  "-object input-linux,id=kbd1,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-kbd`,grab_all=on,repeat=on"
+  "-object input-linux,id=mouse,evdev=/dev/input/by-path/`ls /dev/input/by-path|grep event-mouse`"
+  "-mem-path /dev/hugepages -mem-prealloc"
+  "-global PIIX4_PM.disable_s3=1"
+  "-global PIIX4_PM.disable_s4=1" 
+  "-parallel none"
+  "-vga none"
+  "-vnc $VNC"
+  "-m $MEM"
+  "-smp $SMP,sockets=$SOCKETS,cores=$CORES,threads=$THREADS,maxcpus=$MAXCPUS"
+  "-name $vmname,process=$vmname"
+  "-boot order=$BOOT_ORDER,menu=on,splash=$BOOT_SPLASH,splash-time=5000"
+  "-device vfio-pci,host=$VGAHOST_SHORT,id=hostdev0,bus=pci.0,addr=0x02,romfile=$ROM_FILE"
+  "-device $AUDIO_DEVICE"
+  "-drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE"
+  $KVM_NET_OPTS
+  "-monitor telnet:$TELNET,server,nowait"
+  )
+  
+  ## Optional parameters
+  [[ -z $OS_ISO ]] && QEMUArgs+=("-drive file=$OS_ISO,index=2,media=cdrom")
+  [[ -z $DRV_ISO ]] && QEMUArgs+=("-drive file=$DRV_ISO,index=3,media=cdrom")
+  
+  cmdline=""
+  for arg in ${QEMUArgs[@]}; do
+    cmdline+=" $arg"
+  done
+  $QEMU $cmdline
   if [ $? -ne 0 ]; then
     echo "idv start failed"
     func_sig_exit
