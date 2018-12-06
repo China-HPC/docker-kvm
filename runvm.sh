@@ -446,7 +446,6 @@ func_idv_start() {
   "-m $MEM"
   "-smp $SMP,sockets=$SOCKETS,cores=$CORES,threads=$THREADS,maxcpus=$MAXCPUS"
   "-name $vmname,process=$vmname"
-  "-boot order=$BOOT_ORDER,menu=on,splash=$BOOT_SPLASH,splash-time=5000"
   "-device vfio-pci,host=$VGAHOST_SHORT,id=hostdev0,bus=pci.0,addr=0x02,romfile=$ROM_FILE"
   "-device $AUDIO_DEVICE"
   "-drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE"
@@ -455,14 +454,16 @@ func_idv_start() {
   )
   
   ## Optional parameters
-  [[ -z $OS_ISO ]] && QEMUArgs+=("-drive file=$OS_ISO,index=2,media=cdrom")
+  [[ -z $OS_ISO ]] && QEMUArgs+=("-drive file=$OS_ISO,index=2,media=cdrom") && BOOT_ORDER='d'
   [[ -z $DRV_ISO ]] && QEMUArgs+=("-drive file=$DRV_ISO,index=3,media=cdrom")
-  
-  cmdline=""
+  QEMUArgs+=("-boot order=$BOOT_ORDER,menu=on,splash=$BOOT_SPLASH,splash-time=5000")
+ 
+
+  args=""
   for arg in ${QEMUArgs[@]}; do
-    cmdline+=" $arg"
+    args+=" $arg"
   done
-  $QEMU $cmdline
+  $QEMU $args
   if [ $? -ne 0 ]; then
     echo "idv start failed"
     func_sig_exit
