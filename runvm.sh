@@ -451,12 +451,20 @@ func_idv_start() {
   "-drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE"
   $KVM_NET_OPTS
   "-monitor telnet:$TELNET,server,nowait"
+  "nec-usb-xhci,id=xhci"
   )
   
   ## Optional parameters
   [[ -z $OS_ISO ]] && QEMUArgs+=("-drive file=$OS_ISO,index=2,media=cdrom") && BOOT_ORDER='d'
   [[ -z $DRV_ISO ]] && QEMUArgs+=("-drive file=$DRV_ISO,index=3,media=cdrom")
   QEMUArgs+=("-boot order=$BOOT_ORDER,menu=on,splash=$BOOT_SPLASH,splash-time=5000")
+
+  ## Handle passthrough devices
+  IFS=',' read -ra devices <<< $EXT_DEVICES
+  for dev in "${devices[@]}"; do
+      IFS=':' read -ra info <<< $dev
+      QEMUArgs+=("-device usb-host,vendorid=0x${info[0]},productid=0x${info[1]}")
+  done
  
 
   args=""
