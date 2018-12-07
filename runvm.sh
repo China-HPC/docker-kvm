@@ -451,7 +451,7 @@ func_idv_start() {
   "-drive id=disk0,cache=writeback,if=virtio,format=qcow2,file=$DISK_FILE"
   $KVM_NET_OPTS
   "-monitor telnet:$TELNET,server,nowait"
-  "nec-usb-xhci,id=xhci"
+  "-device nec-usb-xhci,id=xhci"
   )
   
   ## Optional parameters
