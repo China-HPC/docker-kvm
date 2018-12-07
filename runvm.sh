@@ -467,11 +467,7 @@ func_idv_start() {
   done
  
 
-  args=""
-  for arg in ${QEMUArgs[@]}; do
-    args+=" $arg"
-  done
-  $QEMU $args
+  $QEMU ${QEMUArgs[@]}
   if [ $? -ne 0 ]; then
     echo "idv start failed"
     func_sig_exit
